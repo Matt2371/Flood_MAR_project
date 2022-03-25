@@ -3,7 +3,7 @@ from tqdm import tqdm
 
 
 # PURPOSE: clean/process/create raw csv's for further analysis and plotting in other scripts
-
+# FIXME: PLANNED - 10 YEAR ROLLING ANALYSIS
 
 # Separates layer type (unconfined/confined/average) for all elements in the given DWR data
 # Flood-MAR Strategy, str: ['Baseline', 'Initial', 'Intermediate', 'Robust']
@@ -29,7 +29,7 @@ def separate_csv(strategy):
     return
 
 
-# Take separated csv's and take annual averages for all elements (water year, OCT to OCT), also adds 'BASIN_AVERAGE' col
+# Take separated csv's and take ANNUAL AVERAGES for all elements (water year, OCT to OCT), also adds 'BASIN_AVERAGE' col
 # strategy, str: ['Baseline', 'Initial', 'Intermediate', 'Robust']
 # layer, str = ['confined', 'unconfined', 'average']
 def annual_avg(strategy, layer):
@@ -47,7 +47,7 @@ def annual_avg(strategy, layer):
     return
 
 
-# From annual average exports, cut out DAC elements, also adds 'DAC_AVERAGE' col
+# From ANNUAL AVERAGE exports, cut out DAC elements, also adds 'DAC_AVERAGE' col
 def dac_cut(strategy, layer):
     # read DWR special management zones
     special_zones = pd.read_csv('Data/SpecialManagementZones_Elements.csv')
@@ -73,7 +73,7 @@ def dac_cut(strategy, layer):
     return
 
 
-# Calculate GW level (annual average) relative to the baseline for each Flood-MAR strategy (calculate deltas)
+# Calculate GW level (ANNUAL AVERAGE) relative to the baseline for each Flood-MAR strategy (calculate deltas)
 def deltas(strategy, layer):
     if strategy == 'Baseline':
         return
@@ -92,6 +92,26 @@ def deltas(strategy, layer):
     return
 
 
+# FOR DAC ELEMENTS: Calculate GW level (ANNUAL AVERAGE) relative to the baseline
+# for each Flood-MAR strategy (calculate deltas)
+def dac_deltas(strategy, layer):
+    if strategy == 'Baseline':
+        return
+    else:
+        # read Baseline data to compare other strategies with
+        df_baseline = pd.read_csv('Data/Annual_averages/DAC/Baseline_GW_' + layer + '_aa_DAC.csv', index_col=0,
+                                  parse_dates=True)
+        # read data for other strategy
+        df = pd.read_csv('Data/Annual_averages/DAC/' + strategy + '_GW_' + layer + '_aa_DAC.csv', index_col=0,
+                         parse_dates=True)
+        # subtract baseline from baseline
+        df = df.subtract(df_baseline)
+    # export resulting csv's
+    df.to_csv('Data/Annual_averages/DAC/Deltas/' + strategy + '_GW_' + layer + '_aa_DAC_del.csv')
+
+    return
+
+
 # Export separated csv's for all strategies
 strategies = ['Baseline', 'Initial', 'Intermediate', 'Robust']
 layers = ['confined', 'unconfined', 'average']
@@ -100,11 +120,11 @@ for strategy in tqdm(strategies, desc='Exporting csv'):
     separate_csv(strategy)
 
     for layer in layers:
-        # take and export annual averages
+        # take and export ANNUAL AVERAGE
         annual_avg(strategy, layer)
-        # cut out and export DAC elements (annual average)
+        # cut out and export DAC elements
         dac_cut(strategy, layer)
         # export csv's of deltas against baseline
         deltas(strategy, layer)
-
-
+        # export csv's of deltas for DAC's
+        dac_deltas(strategy, layer)

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
-# plot differences between layers for each strategy
+# plot differences between layers for each strategy, ANNUAL AVERAGE
 # strategy, str: ['Baseline', 'Initial', 'Intermediate', 'Robust']
 def compare_layers(strategy):
     # read csv's
@@ -30,16 +30,16 @@ def compare_layers(strategy):
     return
 
 
-# plot differences between strategies for each layer
+# plot differences between strategies for each layer, ANNUAL AVERAGE
 # layer, str = ['confined', 'unconfined', 'average']
-def compare_strategies(Layer):
-    df_initial = pd.read_csv('Data/Annual_averages/' + 'Initial_GW_' + Layer + '_annual_avg.csv', index_col=0,
+def compare_strategies(layer):
+    df_initial = pd.read_csv('Data/Annual_averages/' + 'Initial_GW_' + layer + '_annual_avg.csv', index_col=0,
                              parse_dates=True)
-    df_intermediate = pd.read_csv('Data/Annual_averages/' + 'Intermediate_GW_' + Layer + '_annual_avg.csv', index_col=0,
+    df_intermediate = pd.read_csv('Data/Annual_averages/' + 'Intermediate_GW_' + layer + '_annual_avg.csv', index_col=0,
                                   parse_dates=True)
-    df_robust = pd.read_csv('Data/Annual_averages/' + 'Robust_GW_' + Layer + '_annual_avg.csv', index_col=0,
+    df_robust = pd.read_csv('Data/Annual_averages/' + 'Robust_GW_' + layer + '_annual_avg.csv', index_col=0,
                             parse_dates=True)
-    df_baseline = pd.read_csv('Data/Annual_averages/' + 'Baseline_GW_' + Layer + '_annual_avg.csv', index_col=0,
+    df_baseline = pd.read_csv('Data/Annual_averages/' + 'Baseline_GW_' + layer + '_annual_avg.csv', index_col=0,
                               parse_dates=True)
 
     # plot to compare strategies
@@ -50,16 +50,16 @@ def compare_strategies(Layer):
 
     plt.xlabel('Year')
     plt.ylabel('Groundwater Level, ft')
-    plt.title('Basin-wide average annual GW: ' + Layer + ' layer')
+    plt.title('Basin-wide annual average GW: ' + layer + ' layer')
     plt.legend(['Baseline', 'Initial', 'Intermediate', 'Robust'])
 
-    plt.savefig('Data/Annual_averages/Figures/' + Layer + '_compare_strategies.png')
+    plt.savefig('Data/Annual_averages/Figures/' + layer + '_compare_strategies.png')
     plt.clf()
 
     return
 
 
-# compare all features/layers in one graph
+# compare all features/layers in one graph, ANNUAL AVERAGE
 def combine_all():
     df_initial_uc = pd.read_csv('Data/Annual_averages/' + 'Initial_GW_unconfined_annual_avg.csv', index_col=0,
                                 parse_dates=True)
@@ -120,13 +120,40 @@ def combine_all():
     return
 
 
+# FOR BASIN_WIDE DELTAS: plot differences between strategies for each layer, ANNUAL AVERAGE
+# layer, str = ['confined', 'unconfined', 'average']
+def del_compare_strategies(layer):
+    df_initial = pd.read_csv('Data/Annual_averages/Deltas/Initial_GW_' + layer + '_aa_del.csv', index_col=0,
+                             parse_dates=True)
+    df_intermediate = pd.read_csv('Data/Annual_averages/Deltas/Intermediate_GW_' + layer + '_aa_del.csv', index_col=0,
+                                  parse_dates=True)
+    df_robust = pd.read_csv('Data/Annual_averages/Deltas/Robust_GW_' + layer + '_aa_del.csv', index_col=0,
+                            parse_dates=True)
+
+    # plot to compare strategies
+    plt.plot(df_initial['BASIN_AVERAGE'])
+    plt.plot(df_intermediate['BASIN_AVERAGE'])
+    plt.plot(df_robust['BASIN_AVERAGE'])
+
+    plt.xlabel('Year')
+    plt.ylabel('Groundwater Level Deltas, ft')
+    plt.title('Basin-wide annual average GW relative to Baseline: ' + layer + ' layer')
+    plt.legend(['Initial', 'Intermediate', 'Robust'])
+
+    plt.savefig('Data/Annual_averages/Figures/' + layer + '_compare_strategies_del.png')
+    plt.clf()
+
+    return
+
+
 strategies = ['Baseline', 'Initial', 'Intermediate', 'Robust']
 
-for strategy in tqdm(strategies, desc='Plotting results (strategies):'):
+for strategy in tqdm(strategies, desc='Plotting results (strategies)'):
     compare_layers(strategy)
 
 layers = ['confined', 'unconfined', 'average']
-for layer in tqdm(layers, desc='Plotting results (layers):'):
+for layer in tqdm(layers, desc='Plotting results (layers)'):
     compare_strategies(layer)
+    del_compare_strategies(layer)
 
 combine_all()

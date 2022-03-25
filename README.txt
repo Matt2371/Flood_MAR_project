@@ -12,19 +12,18 @@ separate_csv(strategy), separates layer type (confined/unconfined/average) from 
 annual_average(strategy, layer), takes water year average (OCT-OCT) from separated data (see above) given the strategy and layer
 dac_cut(strategy, layer), cuts DAC elements out of annual averaged data (see above) and exports as new csv's given the strategy and layer
 deltas(strategy, layer), calculates differences of GW level relative to Baseline for each strategy
+dac_deltas(strategy, layer), calculates differences of GW level relative to Baseline for each strategy under DAC elements
 
 initial_analysis.py: make plots/tables of basin-wide time evolution of GW levels
-compare_layers(strategy), plot each layer type for given strategy (reads annual average results)
-compare_strategies(layer), plot each strategy for given layer type(reads annual average results)
+compare_layers(strategy), plot each layer type for given strategy, ANNUAL AVERAGE
+compare_strategies(layer), plot each strategy for given layer type, ANNUAL AVERAGE
+del_compare_strategies(Layer), plot deltas of each strategy compared to baseline, ANNUAL AVERAGE
 ** Planned **
-Plot deltas of each strategy compared to baseline
-Generate table of min/max/average/std at simulation end (or other years) to study distribution of GW levels for each strategy
+Generate table of min/max/average/std at simulation end (or other years) to study distribution of GW level ACCUMULATION for each strategy
 
 DACs.py: compare Flood-MAR strategies under DAC's
-dac_compare_strategies(layer), plot each strategy for given layer (under DAC's)
-** Planned **
-Plot deltas of each strategy compared to baseline
-Generate table of min/max/average/std at simulation end (or other years) to study distribution of GW levels for each strategy
+dac_compare_strategies(layer), plot each strategy for given layer (under DAC's), ANNUAL AVERAGE
+dac_del_compare_strategies(layer), plot each strategy for given layer (under DAC's) relative to Baseline strategy, ANNUAL AVERAGE
 
 GW_ecosystems.py:
 ** Planned **
@@ -44,12 +43,15 @@ PROJECT FOLDER CONTENTS:
 Data/ - given groundwater level data from DWR
 Data/Separated/ - given GW level data separated into lyaer type: unconfined/confined/average csv's
 Data/Annual_Averages/ - csv's of annually-averaged data (OCT-OCT) from separated data csv's (all elements)
+Data/Annual_Averages/Deltas/ - csv's of GW data RELATIVE to baseline scenario
 Data/Annual_Averages/Figures/ - plots from initial analysis, time evolution of GW level for each strategy, etc..
 Data/Annual_Averages/DAC/ - csv's of annual averaged GW level for DAC elements
+Data/Annual_Averages/DAC/Deltas/ - csv's of annual averaged GW level for DAC elements RELATIVE to baseline scenario
 Data/Annual_Averages/DAC/Figures/ - Figures for the DAC analysis
-Data/Annual_Averages/Deltas/ - csv's of GW data RELATIVE to baseline scenario
 
-
+** PLANNED FUTURE ANALYSIS **:
+Conduct analysis with ROLLING AVERAGES (10 year) to reduce noise of wet/dry year fluctuations
+Plot distributions (e.g. boxplots) of 10-year ROLLING AVERAGES, generate tables of min/max/stdv
 
 
 
