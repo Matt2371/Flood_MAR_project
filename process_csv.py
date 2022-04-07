@@ -3,7 +3,6 @@ from tqdm import tqdm
 
 
 # PURPOSE: clean/process/create raw csv's for further analysis and plotting in other scripts
-# FIXME: PLANNED - 10 YEAR ROLLING ANALYSIS
 
 # Separates layer type (unconfined/confined/average) for all elements in the given DWR data
 # Flood-MAR Strategy, str: ['Baseline', 'Initial', 'Intermediate', 'Robust']
@@ -47,31 +46,39 @@ def annual_avg(strategy, layer):
     return
 
 
-# From ANNUAL AVERAGE exports, cut out DAC elements, also adds 'DAC_AVERAGE' col
-def dac_cut(strategy, layer):
+## CUT OUT SPECIAL MANAGEMENT ZONES
+
+# From ANNUAL AVERAGE exports, cut out SPECIAL MANAGEMENT ZONES, adds SPATIAL AVERAGES
+# special_management_zone, str = ['DAC', 'GWDZones', 'Subsidence', 'EconSR1', 'EconSR2&3']
+def smz_cut(special_management_zone, strategy, layer):
+    # create dictionary of file naming conventions for special management zone types
+    zone = {'DAC': 'DAC', 'GWDZones': 'GWD', 'Subsidence': 'SUB', 'EconSR1': 'SR1', 'EconSR2&3': 'SR23'}
+
     # read DWR special management zones
     special_zones = pd.read_csv('Data/SpecialManagementZones_Elements.csv')
-    # pull DAC names (n=36), also drop NaN's
-    dac_list = special_zones['DAC'].dropna().to_list()
-
+    # pull element names of specified special management zone
+    zone_list = special_zones[special_management_zone].dropna().to_list()
     # convert elements to int then str
-    dac_list = [str(entry) for entry in [int(element) for element in dac_list]]
+    zone_list = [str(entry) for entry in [int(element) for element in zone_list]]
 
     # read annual average GW data
     df = pd.read_csv('Data/Annual_averages/' + strategy + '_GW_' + layer + '_annual_avg.csv', index_col=0,
                      parse_dates=True)
 
-    # separate DAC's
-    df = df[dac_list].copy()
+    # separate special management zones
+    df = df[zone_list].copy()
 
-    # add annual averages
-    df['DAC_AVERAGE'] = df.mean(axis=1)
+    # add spatial averages
+    df[zone[special_management_zone] + '_AVERAGE'] = df.mean(axis=1)
 
     # export results, aa denotes "annual averaged"
-    df.to_csv('Data/Annual_averages/DAC/' + strategy + '_GW_' + layer + '_aa_DAC.csv')
+    df.to_csv('Data/Annual_averages/' + special_management_zone + '/' + strategy + '_GW_' + layer + '_aa_' +
+              zone[special_management_zone] + '.csv')
 
     return
 
+
+## FIND DELTAS FOR BASIN WIDE AND SPECIAL MANAGEMENT ZONES
 
 # Calculate GW level (ANNUAL AVERAGE) relative to the baseline for each Flood-MAR strategy (calculate deltas)
 def deltas(strategy, layer):
@@ -92,23 +99,152 @@ def deltas(strategy, layer):
     return
 
 
-# FOR DAC ELEMENTS: Calculate GW level (ANNUAL AVERAGE) relative to the baseline
+# ## DISCONTINUED
+# # FOR DAC ELEMENTS: Calculate GW level (ANNUAL AVERAGE) relative to the baseline
+# # for each Flood-MAR strategy (calculate deltas)
+# def dac_deltas(strategy, layer):
+#     if strategy == 'Baseline':
+#         return
+#     else:
+#         # read Baseline data to compare other strategies with
+#         df_baseline = pd.read_csv('Data/Annual_averages/DAC/Baseline_GW_' + layer + '_aa_DAC.csv', index_col=0,
+#                                   parse_dates=True)
+#         # read data for other strategy
+#         df = pd.read_csv('Data/Annual_averages/DAC/' + strategy + '_GW_' + layer + '_aa_DAC.csv', index_col=0,
+#                          parse_dates=True)
+#         # subtract baseline from baseline
+#         df = df.subtract(df_baseline)
+#     # export resulting csv's
+#     df.to_csv('Data/Annual_averages/DAC/Deltas/' + strategy + '_GW_' + layer + '_aa_DAC_del.csv')
+#
+#     return
+
+
+# FOR SPECIAL MANAGEMENT ZONE: Calculate GW level (ANNUAL AVERAGE) relative to the baseline
 # for each Flood-MAR strategy (calculate deltas)
-def dac_deltas(strategy, layer):
+def smz_deltas(special_management_zone, strategy, layer):
+    # create dictionary of file naming conventions for special management zone types
+    zone = {'DAC': 'DAC', 'GWDZones': 'GWD', 'Subsidence': 'SUB', 'EconSR1': 'SR1', 'EconSR2&3': 'SR23'}
+
     if strategy == 'Baseline':
         return
     else:
         # read Baseline data to compare other strategies with
-        df_baseline = pd.read_csv('Data/Annual_averages/DAC/Baseline_GW_' + layer + '_aa_DAC.csv', index_col=0,
+        df_baseline = pd.read_csv('Data/Annual_averages/' + special_management_zone + '/Baseline_GW_' + layer +
+                                  '_aa_' + zone[special_management_zone] + '.csv', index_col=0,
                                   parse_dates=True)
         # read data for other strategy
-        df = pd.read_csv('Data/Annual_averages/DAC/' + strategy + '_GW_' + layer + '_aa_DAC.csv', index_col=0,
+        df = pd.read_csv('Data/Annual_averages/' + special_management_zone + '/' + strategy + '_GW_' + layer +
+                         '_aa_' + zone[special_management_zone] + '.csv', index_col=0,
                          parse_dates=True)
         # subtract baseline from baseline
         df = df.subtract(df_baseline)
     # export resulting csv's
-    df.to_csv('Data/Annual_averages/DAC/Deltas/' + strategy + '_GW_' + layer + '_aa_DAC_del.csv')
+    df.to_csv('Data/Annual_averages/' + special_management_zone + '/Deltas/' + strategy + '_GW_' + layer +
+              '_aa_' + zone[special_management_zone] + '_del.csv')
 
+    return
+
+
+## FIND DISTRIBUTIONS (MIN/MAX/MED/MEAN/STDEV) FOR BASIN-WIDE AND SPECIAL MANAGEMENT ZONES
+
+
+# Create tables of distribution (min/max/med/mean/stdv) of elements for ANNUAL AVERAGE
+def distribution(strategy, layer):
+    # read data
+    df = pd.read_csv('Data/Annual_averages/' + strategy + '_GW_' + layer + '_annual_avg.csv',
+                     index_col=0,
+                     parse_dates=True)
+
+    # initialize new dataframe with distribution parameters (same index/datetimes as imported file)
+    df_distr = pd.DataFrame(index=df.index)
+    # populate dataframe
+    df_distr['Min'] = df.min(axis=1)
+    df_distr['Max'] = df.max(axis=1)
+    df_distr['Stdev'] = df.std(axis=1)
+    df_distr['Mean'] = df.mean(axis=1)
+    df_distr['Median'] = df.median(axis=1)
+
+    # export dataframe
+    df_distr.to_csv('Data/Annual_averages/Distributions/Distribution_' + strategy + '_GW_' + layer +
+                    '_aa.csv')
+
+    return
+
+
+# Create tables of distribution (min/max/med/mean/stdv) of elements for ANNUAL AVERAGE DELTAS
+def distribution_deltas(strategy, layer):
+    # read annual average deltas data
+    if strategy == 'Baseline':
+        return
+    else:
+        df = pd.read_csv('Data/Annual_averages/Deltas/' + strategy + '_GW_' + layer + '_aa_del.csv',
+                         index_col=0,
+                         parse_dates=True)
+
+        # initialize new dataframe with distribution parameters (same index/datetimes as imported file)
+        df_distr = pd.DataFrame(index=df.index)
+        # populate dataframe
+        df_distr['Min'] = df.min(axis=1)
+        df_distr['Max'] = df.max(axis=1)
+        df_distr['Stdev'] = df.std(axis=1)
+        df_distr['Mean'] = df.mean(axis=1)
+        df_distr['Median'] = df.median(axis=1)
+
+    df_distr.to_csv('Data/Annual_averages/Deltas/Distributions/Distribution_' + strategy + '_GW_' + layer +
+                    '_aa_del.csv')
+
+    return
+
+
+## DISCONTINUED
+# # Add tables of distribution (min/max/med/mean/stdv) of DAC elements for ANNUAL AVERAGE DELTAS
+# def dac_distribution_deltas(strategy, layer):
+#     # read annual average deltas data
+#     if strategy == 'Baseline':
+#         return
+#     else:
+#         df = pd.read_csv('Data/Annual_averages/DAC/Deltas/' + strategy + '_GW_' + layer + '_aa_DAC_del.csv',
+#                          index_col=0,
+#                          parse_dates=True)
+#
+#         # initialize new dataframe with distribution parameters (same index/datetimes as imported file)
+#         df_distr = pd.DataFrame(index=df.index)
+#         # populate dataframe
+#         df_distr['Min'] = df.min(axis=1)
+#         df_distr['Max'] = df.max(axis=1)
+#         df_distr['Stdev'] = df.std(axis=1)
+#         df_distr['Mean'] = df.mean(axis=1)
+#         df_distr['Median'] = df.median(axis=1)
+#
+#     df_distr.to_csv('Data/Annual_averages/DAC/Deltas/Distributions/Distribution_' + strategy + '_GW_' + layer +
+#                     '_aa_DAC_del.csv')
+#     return
+
+
+# Create tables of distribution (min/max/med/mean/stdv) of elements for ANNUAL AVERAGE for SPECIAL MANAGEMENT ZONES
+# special_management_zone, str = ['DAC', 'GWDZones', 'Subsidence', 'EconSR1', 'EconSR2&3']
+def smz_distribution(special_management_zone, strategy, layer):
+    # create dictionary of file naming conventions for special management zone types
+    zone = {'DAC': 'DAC', 'GWDZones': 'GWD', 'Subsidence': 'SUB', 'EconSR1': 'SR1', 'EconSR2&3': 'SR23'}
+    # read data
+    df = pd.read_csv('Data/Annual_averages/' + special_management_zone + '/' + strategy + '_GW_' + layer + '_aa_' +
+                     zone[special_management_zone] + '.csv',
+                     index_col=0,
+                     parse_dates=True)
+
+    # initialize new dataframe with distribution parameters (same index/datetimes as imported file)
+    df_distr = pd.DataFrame(index=df.index)
+    # populate dataframe
+    df_distr['Min'] = df.min(axis=1)
+    df_distr['Max'] = df.max(axis=1)
+    df_distr['Stdev'] = df.std(axis=1)
+    df_distr['Mean'] = df.mean(axis=1)
+    df_distr['Median'] = df.median(axis=1)
+
+    df_distr.to_csv(
+        'Data/Annual_averages/' + special_management_zone + '/Distributions/Distribution_' + strategy + '_GW_' + layer +
+        '_aa_' + zone[special_management_zone] + '.csv')
     return
 
 
@@ -123,8 +259,27 @@ for strategy in tqdm(strategies, desc='Exporting csv'):
         # take and export ANNUAL AVERAGE
         annual_avg(strategy, layer)
         # cut out and export DAC elements
-        dac_cut(strategy, layer)
+        smz_cut('DAC', strategy, layer)
+        # cut out and export GWD elements
+        smz_cut('Subsidence', strategy, layer)
+        # cut out and export Subsidence elements
+        smz_cut('GWDZones', strategy, layer)
+
         # export csv's of deltas against baseline
         deltas(strategy, layer)
-        # export csv's of deltas for DAC's
-        dac_deltas(strategy, layer)
+        # export csv's of deltas
+        # dac_deltas(strategy, layer)
+        smz_deltas('DAC', strategy, layer)
+        smz_deltas('Subsidence', strategy, layer)
+        smz_deltas('GWDZones', strategy, layer)
+
+        # create tables of distribution parameters for deltas
+        distribution_deltas(strategy, layer)
+
+        # Find basin-wide and special management zone distributions
+        distribution(strategy, layer)
+        smz_distribution('DAC', strategy, layer)
+        smz_distribution('Subsidence', strategy, layer)
+        smz_distribution('GWDZones', strategy, layer)
+        smz_distribution('EconSR1', strategy, layer)
+        smz_distribution('EconSR2&3', strategy, layer)

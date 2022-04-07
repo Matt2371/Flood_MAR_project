@@ -146,6 +146,36 @@ def del_compare_strategies(layer):
     return
 
 
+# ## DISCONTINUED
+# # Plot MINIMUMS of baseline DELTAS for different strategies, ANNUAL AVERAGE DELTAS
+# def del_compare_strategies_mins(layer):
+#     # import strategies for given layer
+#     df_initial = pd.read_csv('Data/Annual_averages/Deltas/Distributions/Distribution_initial_GW_' + layer +
+#                              '_aa_del.csv', index_col=0, parse_dates=True)
+#     df_intermediate = pd.read_csv('Data/Annual_averages/Deltas/Distributions/Distribution_intermediate_GW_' + layer +
+#                                   '_aa_del.csv', index_col=0, parse_dates=True)
+#     df_robust = pd.read_csv('Data/Annual_averages/Deltas/Distributions/Distribution_robust_GW_' + layer +
+#                             '_aa_del.csv', index_col=0, parse_dates=True)
+#
+#     # plot min for initial strategy
+#     plt.plot(df_initial['Min'])
+#
+#     # plot min for intermediate strategy
+#     plt.plot(df_intermediate['Min'])
+#
+#     # plot min for robust strategy
+#     plt.plot(df_robust['Min'])
+#
+#     plt.title('Minimums of GW level deltas for ' + layer + ' layer')
+#     plt.xlabel('Year')
+#     plt.ylabel('Groundwater level deltas, ft')
+#     plt.legend(['Initial', 'Intermediate', 'Robust'])
+#
+#     plt.savefig('Data/Annual_averages/Figures/' + layer + '_compare_strategies_del_mins.png')
+#     plt.clf()
+#     return
+
+
 strategies = ['Baseline', 'Initial', 'Intermediate', 'Robust']
 
 for strategy in tqdm(strategies, desc='Plotting results (strategies)'):
