@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
-# for given layer, plot differences (annual average GW level under all SUBSIDENCE ELEMENTS) between strategies, ANNUAL AVERAGE
+# for given layer, plot differences (annual average GW level under all SUBSIDENCE ELEMENTS) between strategies,
+# ANNUAL AVERAGE
 def sub_compare_strategies(layer):
     # read SUB_cut csv's
     df_baseline = pd.read_csv('Data/Annual_averages/Subsidence/Baseline_GW_' + layer + '_aa_SUB.csv', index_col=0,
@@ -78,6 +79,7 @@ def sub_boxplot(strategy, layer):
     plt.ylabel('Groundwater level, ft')
     plt.xlabel('Year')
     plt.savefig('Data/Annual_averages/Subsidence/Figures/SUB_' + strategy + '_GW_' + layer + '_aa_boxplot.png')
+    plt.clf()
     return
 
 
@@ -98,6 +100,7 @@ def sub_boxplot_del(strategy, layer):
     plt.ylabel('Groundwater level, ft')
     plt.xlabel('Year')
     plt.savefig('Data/Annual_averages/Subsidence/Figures/SUB_' + strategy + '_GW_' + layer + '_aa_del_boxplot.png')
+    plt.clf()
     return
 
 

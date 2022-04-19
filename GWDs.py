@@ -76,6 +76,7 @@ def gwd_boxplot(strategy, layer):
     plt.ylabel('Groundwater level, ft')
     plt.xlabel('Year')
     plt.savefig('Data/Annual_averages/GWDZones/Figures/GWD_' + strategy + '_GW_' + layer + '_aa_boxplot.png')
+    plt.clf()
     return
 
 
@@ -97,6 +98,7 @@ def gwd_boxplot_del(strategy, layer):
     plt.ylabel('Groundwater level, ft')
     plt.xlabel('Year')
     plt.savefig('Data/Annual_averages/GWDZones/Figures/GWD_' + strategy + '_GW_' + layer + '_aa_del_boxplot.png')
+    plt.clf()
     return
 
 
