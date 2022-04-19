@@ -16,10 +16,10 @@ def dac_compare_strategies(layer):
                             parse_dates=True)
 
     # plot to compare strategies
-    plt.plot(df_baseline['DAC_AVERAGE'])
-    plt.plot(df_initial['DAC_AVERAGE'])
-    plt.plot(df_intermediate['DAC_AVERAGE'])
-    plt.plot(df_robust['DAC_AVERAGE'])
+    plt.plot(df_baseline['DAC_AVERAGE'], color='#610345')
+    plt.plot(df_initial['DAC_AVERAGE'], color='#5773FF')
+    plt.plot(df_intermediate['DAC_AVERAGE'], color='#00D19D')
+    plt.plot(df_robust['DAC_AVERAGE'], color='#9B7874')
 
     plt.xlabel('Year')
     plt.ylabel('Groundwater Level, ft')
@@ -43,9 +43,9 @@ def dac_del_compare_strategies(layer):
                             parse_dates=True)
 
     # plot to compare strategies
-    plt.plot(df_initial['DAC_AVERAGE'])
-    plt.plot(df_intermediate['DAC_AVERAGE'])
-    plt.plot(df_robust['DAC_AVERAGE'])
+    plt.plot(df_initial['DAC_AVERAGE'], color='#5773FF')
+    plt.plot(df_intermediate['DAC_AVERAGE'], color='#00D19D')
+    plt.plot(df_robust['DAC_AVERAGE'], color='#9B7874')
 
     plt.xlabel('Year')
     plt.ylabel('Groundwater Level Deltas, ft')
@@ -58,8 +58,57 @@ def dac_del_compare_strategies(layer):
     return
 
 
+# FOR LAST 10 YEARS OF SIMULATION, DAC ELEMENTS: create boxplot of basin-wide distribution, ANNUAL AVERAGE
+def dac_boxplot(strategy, layer):
+    df = pd.read_csv('Data/Annual_averages/DAC/' + strategy + '_GW_' + layer + '_aa_DAC.csv', index_col=0,
+                     parse_dates=True)
+    # show only year in index
+    df.index = df.index.year
+    # remove basin average column
+    df.drop('DAC_AVERAGE', axis=1)
+    # take last 10 years
+    df = df.tail(10)
+
+    # create boxplot
+    df.T.plot.box(showfliers=False)
+    plt.title('GW level under DAC\'s: ' + strategy.lower() + ' strategy ' + layer.lower() + ' layer')
+    plt.ylabel('Groundwater level, ft')
+    plt.xlabel('Year')
+    plt.savefig('Data/Annual_averages/DAC/Figures/DAC_' + strategy + '_GW_' + layer + '_aa_boxplot.png')
+    return
+
+
+# FOR LAST 10 YEARS OF SIMULATION, DAC elements: create boxplot of basin-wide distribution of DELTAS, ANNUAL AVERAGE
+def dac_boxplot_del(strategy, layer):
+    df = pd.read_csv('Data/Annual_averages/DAC/Deltas/' + strategy + '_GW_' + layer + '_aa_DAC_del.csv', index_col=0,
+                     parse_dates=True)
+    # show only year in index
+    df.index = df.index.year
+    # remove basin average column
+    df.drop('DAC_AVERAGE', axis=1)
+    # take last 10 years
+    df = df.tail(10)
+
+    # create boxplot
+    df.T.plot.box(showfliers=False)
+    plt.title('GW deltas under DAC\'s: ' + strategy.lower() + ' strategy ' + layer.lower() + ' layer')
+    plt.ylabel('Groundwater level, ft')
+    plt.xlabel('Year')
+    plt.savefig('Data/Annual_averages/DAC/Figures/DAC_' + strategy + '_GW_' + layer + '_aa_del_boxplot.png')
+    return
+
+
 # Plot results
 layers = ['confined', 'unconfined', 'average']
+strategies = ['Baseline', 'Initial', 'Intermediate', 'Robust']
+
 for layer in tqdm(layers, desc='Exporting results (layers):'):
     dac_compare_strategies(layer)
     dac_del_compare_strategies(layer)
+
+    for strategy in strategies:
+        dac_boxplot(strategy, layer)
+        if strategy == 'Baseline':
+            continue
+        dac_boxplot_del(strategy, layer)
+

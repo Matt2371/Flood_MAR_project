@@ -43,10 +43,10 @@ def compare_strategies(layer):
                               parse_dates=True)
 
     # plot to compare strategies
-    plt.plot(df_baseline['BASIN_AVERAGE'])
-    plt.plot(df_initial['BASIN_AVERAGE'])
-    plt.plot(df_intermediate['BASIN_AVERAGE'])
-    plt.plot(df_robust['BASIN_AVERAGE'])
+    plt.plot(df_baseline['BASIN_AVERAGE'], color='#610345')
+    plt.plot(df_initial['BASIN_AVERAGE'], color='#5773FF')
+    plt.plot(df_intermediate['BASIN_AVERAGE'], color='#00D19D')
+    plt.plot(df_robust['BASIN_AVERAGE'], color='#9B7874')
 
     plt.xlabel('Year')
     plt.ylabel('Groundwater Level, ft')
@@ -90,20 +90,20 @@ def combine_all():
 
     # plot to compare strategies
     plt.figure(figsize=(7, 4))
-    plt.plot(df_baseline_uc['BASIN_AVERAGE'], c='blue', ls='--')
-    plt.plot(df_initial_uc['BASIN_AVERAGE'], c='orange', ls='--')
-    plt.plot(df_intermediate_uc['BASIN_AVERAGE'], c='green', ls='--')
-    plt.plot(df_robust_uc['BASIN_AVERAGE'], c='red', ls='--')
+    plt.plot(df_baseline_uc['BASIN_AVERAGE'], c='#610345', ls='--')
+    plt.plot(df_initial_uc['BASIN_AVERAGE'], c='#5773FF', ls='--')
+    plt.plot(df_intermediate_uc['BASIN_AVERAGE'], c='#00D19D', ls='--')
+    plt.plot(df_robust_uc['BASIN_AVERAGE'], c='#9B7874', ls='--')
 
-    plt.plot(df_baseline_c['BASIN_AVERAGE'], c='blue', ls='-.')
-    plt.plot(df_initial_c['BASIN_AVERAGE'], c='orange', ls='-.')
-    plt.plot(df_intermediate_c['BASIN_AVERAGE'], c='green', ls='-.')
-    plt.plot(df_robust_c['BASIN_AVERAGE'], c='red', ls='-.')
+    plt.plot(df_baseline_c['BASIN_AVERAGE'], c='#610345', ls='-.')
+    plt.plot(df_initial_c['BASIN_AVERAGE'], c='#5773FF', ls='-.')
+    plt.plot(df_intermediate_c['BASIN_AVERAGE'], c='#00D19D', ls='-.')
+    plt.plot(df_robust_c['BASIN_AVERAGE'], c='#9B7874', ls='-.')
 
-    plt.plot(df_baseline_a['BASIN_AVERAGE'], c='blue', ls=':')
-    plt.plot(df_initial_a['BASIN_AVERAGE'], c='orange', ls=':')
-    plt.plot(df_intermediate_a['BASIN_AVERAGE'], c='green', ls=':')
-    plt.plot(df_robust_a['BASIN_AVERAGE'], c='red', ls=':')
+    plt.plot(df_baseline_a['BASIN_AVERAGE'], c='#610345', ls=':')
+    plt.plot(df_initial_a['BASIN_AVERAGE'], c='#5773FF', ls=':')
+    plt.plot(df_intermediate_a['BASIN_AVERAGE'], c='#00D19D', ls=':')
+    plt.plot(df_robust_a['BASIN_AVERAGE'], c='#9B7874', ls=':')
 
     plt.xlabel('Year')
     plt.ylabel('Groundwater Level, ft')
@@ -131,9 +131,9 @@ def del_compare_strategies(layer):
                             parse_dates=True)
 
     # plot to compare strategies
-    plt.plot(df_initial['BASIN_AVERAGE'])
-    plt.plot(df_intermediate['BASIN_AVERAGE'])
-    plt.plot(df_robust['BASIN_AVERAGE'])
+    plt.plot(df_initial['BASIN_AVERAGE'], color='#5773FF')
+    plt.plot(df_intermediate['BASIN_AVERAGE'], color='#00D19D')
+    plt.plot(df_robust['BASIN_AVERAGE'], color='#9B7874')
 
     plt.xlabel('Year')
     plt.ylabel('Groundwater Level Deltas, ft')
@@ -146,34 +146,46 @@ def del_compare_strategies(layer):
     return
 
 
-# ## DISCONTINUED
-# # Plot MINIMUMS of baseline DELTAS for different strategies, ANNUAL AVERAGE DELTAS
-# def del_compare_strategies_mins(layer):
-#     # import strategies for given layer
-#     df_initial = pd.read_csv('Data/Annual_averages/Deltas/Distributions/Distribution_initial_GW_' + layer +
-#                              '_aa_del.csv', index_col=0, parse_dates=True)
-#     df_intermediate = pd.read_csv('Data/Annual_averages/Deltas/Distributions/Distribution_intermediate_GW_' + layer +
-#                                   '_aa_del.csv', index_col=0, parse_dates=True)
-#     df_robust = pd.read_csv('Data/Annual_averages/Deltas/Distributions/Distribution_robust_GW_' + layer +
-#                             '_aa_del.csv', index_col=0, parse_dates=True)
-#
-#     # plot min for initial strategy
-#     plt.plot(df_initial['Min'])
-#
-#     # plot min for intermediate strategy
-#     plt.plot(df_intermediate['Min'])
-#
-#     # plot min for robust strategy
-#     plt.plot(df_robust['Min'])
-#
-#     plt.title('Minimums of GW level deltas for ' + layer + ' layer')
-#     plt.xlabel('Year')
-#     plt.ylabel('Groundwater level deltas, ft')
-#     plt.legend(['Initial', 'Intermediate', 'Robust'])
-#
-#     plt.savefig('Data/Annual_averages/Figures/' + layer + '_compare_strategies_del_mins.png')
-#     plt.clf()
-#     return
+# FOR LAST 10 YEARS OF SIMULATION: create boxplot of basin-wide distribution, ANNUAL AVERAGE
+def basin_boxplot(strategy, layer):
+    df = pd.read_csv('Data/Annual_averages/' + strategy + '_GW_' + layer + '_annual_avg.csv',
+                     index_col=0,
+                     parse_dates=True)
+    # show only year in index
+    df.index = df.index.year
+    # remove basin average column
+    df.drop('BASIN_AVERAGE', axis=1)
+    # take last 10 years
+    df = df.tail(10)
+
+    # create boxplot
+    df.T.plot.box(showfliers=False)
+    plt.title('Basin-wide GW level: ' + strategy.lower() + ' strategy ' + layer.lower() + ' layer')
+    plt.ylabel('Groundwater level, ft')
+    plt.xlabel('Year')
+    plt.savefig('Data/Annual_averages/Figures/' + strategy + '_GW_' + layer + '_aa_boxplot.png')
+    return
+
+
+# FOR LAST 10 YEARS OF SIMULATION: create boxplot of basin-wide distribution of DELTAS, ANNUAL AVERAGE
+def basin_boxplot_del(strategy, layer):
+    df = pd.read_csv('Data/Annual_averages/Deltas/' + strategy + '_GW_' + layer + '_aa_del.csv',
+                     index_col=0,
+                     parse_dates=True)
+    # show only year in index
+    df.index = df.index.year
+    # remove basin average column
+    df.drop('BASIN_AVERAGE', axis=1)
+    # take last 10 years
+    df = df.tail(10)
+
+    # create boxplot
+    df.T.plot.box(showfliers=False)
+    plt.title('Basin-wide GW deltas: ' + strategy.lower() + ' strategy ' + layer.lower() + ' layer')
+    plt.ylabel('Groundwater level, ft')
+    plt.xlabel('Year')
+    plt.savefig('Data/Annual_averages/Figures/' + strategy + '_GW_' + layer + '_aa_del_boxplot.png')
+    return
 
 
 strategies = ['Baseline', 'Initial', 'Intermediate', 'Robust']
@@ -187,3 +199,14 @@ for layer in tqdm(layers, desc='Plotting results (layers)'):
     del_compare_strategies(layer)
 
 combine_all()
+
+# create boxplots
+print('Creating boxplots')
+for strategy in strategies:
+    for layer in layers:
+        basin_boxplot(strategy, layer)
+
+        # no baseline strategy for deltas
+        if strategy == 'Baseline':
+            continue
+        basin_boxplot_del(strategy, layer)

@@ -99,27 +99,6 @@ def deltas(strategy, layer):
     return
 
 
-# ## DISCONTINUED
-# # FOR DAC ELEMENTS: Calculate GW level (ANNUAL AVERAGE) relative to the baseline
-# # for each Flood-MAR strategy (calculate deltas)
-# def dac_deltas(strategy, layer):
-#     if strategy == 'Baseline':
-#         return
-#     else:
-#         # read Baseline data to compare other strategies with
-#         df_baseline = pd.read_csv('Data/Annual_averages/DAC/Baseline_GW_' + layer + '_aa_DAC.csv', index_col=0,
-#                                   parse_dates=True)
-#         # read data for other strategy
-#         df = pd.read_csv('Data/Annual_averages/DAC/' + strategy + '_GW_' + layer + '_aa_DAC.csv', index_col=0,
-#                          parse_dates=True)
-#         # subtract baseline from baseline
-#         df = df.subtract(df_baseline)
-#     # export resulting csv's
-#     df.to_csv('Data/Annual_averages/DAC/Deltas/' + strategy + '_GW_' + layer + '_aa_DAC_del.csv')
-#
-#     return
-
-
 # FOR SPECIAL MANAGEMENT ZONE: Calculate GW level (ANNUAL AVERAGE) relative to the baseline
 # for each Flood-MAR strategy (calculate deltas)
 def smz_deltas(special_management_zone, strategy, layer):
@@ -195,31 +174,6 @@ def distribution_deltas(strategy, layer):
                     '_aa_del.csv')
 
     return
-
-
-## DISCONTINUED
-# # Add tables of distribution (min/max/med/mean/stdv) of DAC elements for ANNUAL AVERAGE DELTAS
-# def dac_distribution_deltas(strategy, layer):
-#     # read annual average deltas data
-#     if strategy == 'Baseline':
-#         return
-#     else:
-#         df = pd.read_csv('Data/Annual_averages/DAC/Deltas/' + strategy + '_GW_' + layer + '_aa_DAC_del.csv',
-#                          index_col=0,
-#                          parse_dates=True)
-#
-#         # initialize new dataframe with distribution parameters (same index/datetimes as imported file)
-#         df_distr = pd.DataFrame(index=df.index)
-#         # populate dataframe
-#         df_distr['Min'] = df.min(axis=1)
-#         df_distr['Max'] = df.max(axis=1)
-#         df_distr['Stdev'] = df.std(axis=1)
-#         df_distr['Mean'] = df.mean(axis=1)
-#         df_distr['Median'] = df.median(axis=1)
-#
-#     df_distr.to_csv('Data/Annual_averages/DAC/Deltas/Distributions/Distribution_' + strategy + '_GW_' + layer +
-#                     '_aa_DAC_del.csv')
-#     return
 
 
 # Create tables of distribution (min/max/med/mean/stdv) of elements for ANNUAL AVERAGE for SPECIAL MANAGEMENT ZONES

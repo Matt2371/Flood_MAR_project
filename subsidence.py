@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
-# FIXME: ADD DOCUMENTATION FOR SCRIPT
-
 # for given layer, plot differences (annual average GW level under all SUBSIDENCE ELEMENTS) between strategies, ANNUAL AVERAGE
 def sub_compare_strategies(layer):
     # read SUB_cut csv's
@@ -19,10 +17,10 @@ def sub_compare_strategies(layer):
                             parse_dates=True)
 
     # plot to compare strategies
-    plt.plot(df_baseline['SUB_AVERAGE'])
-    plt.plot(df_initial['SUB_AVERAGE'])
-    plt.plot(df_intermediate['SUB_AVERAGE'])
-    plt.plot(df_robust['SUB_AVERAGE'])
+    plt.plot(df_baseline['SUB_AVERAGE'], color='#610345')
+    plt.plot(df_initial['SUB_AVERAGE'], color='#5773FF')
+    plt.plot(df_intermediate['SUB_AVERAGE'], color='#00D19D')
+    plt.plot(df_robust['SUB_AVERAGE'], color='#9B7874')
 
     plt.xlabel('Year')
     plt.ylabel('Groundwater Level, ft')
@@ -48,9 +46,9 @@ def sub_del_compare_strategies(layer):
                             parse_dates=True)
 
     # plot to compare strategies
-    plt.plot(df_initial['SUB_AVERAGE'])
-    plt.plot(df_intermediate['SUB_AVERAGE'])
-    plt.plot(df_robust['SUB_AVERAGE'])
+    plt.plot(df_initial['SUB_AVERAGE'], color='#5773FF')
+    plt.plot(df_intermediate['SUB_AVERAGE'], color='#00D19D')
+    plt.plot(df_robust['SUB_AVERAGE'], color='#9B7874')
 
     plt.xlabel('Year')
     plt.ylabel('Groundwater Level Deltas, ft')
@@ -63,8 +61,56 @@ def sub_del_compare_strategies(layer):
     return
 
 
+# FOR LAST 10 YEARS OF SIMULATION, SUBSIDENCE ELEMENTS: create boxplot of basin-wide distribution, ANNUAL AVERAGE
+def sub_boxplot(strategy, layer):
+    df = pd.read_csv('Data/Annual_averages/Subsidence/' + strategy + '_GW_' + layer + '_aa_SUB.csv', index_col=0,
+                     parse_dates=True)
+    # show only year in index
+    df.index = df.index.year
+    # remove basin average column
+    df.drop('SUB_AVERAGE', axis=1)
+    # take last 10 years
+    df = df.tail(10)
+
+    # create boxplot
+    df.T.plot.box(showfliers=False)
+    plt.title('GW level under subsidence zones: ' + strategy.lower() + ' strategy ' + layer.lower() + ' layer')
+    plt.ylabel('Groundwater level, ft')
+    plt.xlabel('Year')
+    plt.savefig('Data/Annual_averages/Subsidence/Figures/SUB_' + strategy + '_GW_' + layer + '_aa_boxplot.png')
+    return
+
+
+# LAST 10 YEARS OF SIMULATION, SUBSIDENCE elements: create boxplot of basin-wide distribution of DELTAS, ANNUAL AVERAGE
+def sub_boxplot_del(strategy, layer):
+    df = pd.read_csv('Data/Annual_averages/Subsidence/Deltas/' + strategy + '_GW_' + layer + '_aa_SUB_del.csv', index_col=0,
+                     parse_dates=True)
+    # show only year in index
+    df.index = df.index.year
+    # remove basin average column
+    df.drop('SUB_AVERAGE', axis=1)
+    # take last 10 years
+    df = df.tail(10)
+
+    # create boxplot
+    df.T.plot.box(showfliers=False)
+    plt.title('GW deltas under subsidence zones: ' + strategy.lower() + ' strategy ' + layer.lower() + ' layer')
+    plt.ylabel('Groundwater level, ft')
+    plt.xlabel('Year')
+    plt.savefig('Data/Annual_averages/Subsidence/Figures/SUB_' + strategy + '_GW_' + layer + '_aa_del_boxplot.png')
+    return
+
+
 # Plot results
 layers = ['confined', 'unconfined', 'average']
+strategies = ['Baseline', 'Initial', 'Intermediate', 'Robust']
+
 for layer in tqdm(layers, desc='Exporting results (layers):'):
     sub_compare_strategies(layer)
     sub_del_compare_strategies(layer)
+
+    for strategy in strategies:
+        sub_boxplot(strategy, layer)
+        if strategy == 'Baseline':
+            continue
+        sub_boxplot_del(strategy, layer)
