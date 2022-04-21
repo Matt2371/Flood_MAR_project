@@ -56,7 +56,7 @@ GWL_Econ.py: estimate timeseries of pumping costs under SR1/SR2/SR3. Use current
 * Assume 80% pump efficiency
 * Distance to water data (hydraulic head) given by DWR
 * Calculate cost to pump at 1 m3/s for 1 hour
-pumping_cost(subregion, Q=1, nu=0.8), export and plot timeseires of pumping cost given subregion
+pumping_cost(subregion, Q=1, nu=0.8), export and plot timeseires of pumping cost (savings relative to Baseline) given subregion
 
 DEFINITION OF TERMS/FILENAMING CONVENTION:
 "special management zone" / "SMZ" - model elements delineated by DWR in reference to a particular objective

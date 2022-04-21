@@ -160,7 +160,7 @@ def basin_boxplot(strategy, layer):
 
     # create boxplot
     df.T.plot.box(showfliers=False)
-    plt.title('Basin-wide GW level: ' + strategy.lower() + ' strategy ' + layer.lower() + ' layer')
+    plt.title('GW level, all elements: ' + strategy.lower() + ' strategy ' + layer.lower() + ' layer')
     plt.ylabel('Groundwater level, ft')
     plt.xlabel('Year')
     plt.savefig('Data/Annual_averages/Figures/' + strategy + '_GW_' + layer + '_aa_boxplot.png')
@@ -182,7 +182,7 @@ def basin_boxplot_del(strategy, layer):
 
     # create boxplot
     df.T.plot.box(showfliers=False)
-    plt.title('Basin-wide GW deltas: ' + strategy.lower() + ' strategy ' + layer.lower() + ' layer')
+    plt.title('GW deltas, all elements: ' + strategy.lower() + ' strategy ' + layer.lower() + ' layer')
     plt.ylabel('Groundwater level, ft')
     plt.xlabel('Year')
     plt.savefig('Data/Annual_averages/Figures/' + strategy + '_GW_' + layer + '_aa_del_boxplot.png')

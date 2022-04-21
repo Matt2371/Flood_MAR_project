@@ -23,18 +23,18 @@ def pumping_cost(subregion, Q=1, nu=0.8):
     # calculate cost of pumping 1 hour [USD]
     cost_df = power_df * 0.1359
 
-    # export and plot
+    # export and plot results relative to Baseline
     cost_df.to_csv('Data/GWL_Econ/pumping_cost/' + subregion + '_pumping_cost.csv')
     # cost_df.plot(colormap='Set2')
-    plt.plot(cost_df['Baseline'], color='#610345')
-    plt.plot(cost_df['Initial'], color='#5773FF')
-    plt.plot(cost_df['Intermediate'], color='#00D19D')
-    plt.plot(cost_df['Robust'], color='#9B7874')
+    # plt.plot(cost_df['Baseline'], color='#610345')
+    plt.plot(cost_df['Baseline'] - cost_df['Initial'], color='#5773FF')
+    plt.plot(cost_df['Baseline'] - cost_df['Intermediate'], color='#00D19D')
+    plt.plot(cost_df['Baseline'] - cost_df['Robust'], color='#9B7874')
 
-    plt.title('Cost of pumping at ' + str(Q) + ' $m^3/s$ for 1 hr for ' + subregion)
-    plt.ylabel('Cost, USD')
+    plt.title('Pumping cost savings at ' + str(Q) + ' $m^3/s$ for 1 hr for ' + subregion + ' relative to Baseline')
+    plt.ylabel('USD')
     plt.xlabel('Year')
-    plt.legend(['Baseline', 'Initial', 'Intermediate', 'Robust'])
+    plt.legend(['Initial', 'Intermediate', 'Robust'])
     plt.savefig('Data/GWL_Econ/Figures/' + subregion + '_pumping_cost.png')
     plt.clf()
 
