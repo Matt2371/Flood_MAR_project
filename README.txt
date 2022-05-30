@@ -5,60 +5,26 @@ Analyze 100 year simulation of groundwater (GW) levels for 4 Flood_MAR strategie
 2. GW supply to disadvantaged communities (DAC's)
 3. GW supply to groundwater-dependent communities (GWD's)
 4. GW recharge under subsidence zones
-5. Pumping costs under SR1, SR2, and SR3 zones
+5. Pumping costs under SR1, SR2, and SR3 zones (as defined by the Department of Water Resources)
 
 INCLUDED SCRIPTS:
 
-process_csv.py: *RUN FIRST TO GET NECESSARY FILES*
-separate_csv(strategy), separates layer type (confined/unconfined/average) from given data and exports into 3 separate csv's
-annual_average(strategy, layer), takes water year average (OCT-OCT) from separated data (see above) given the strategy and layer
-*discontinued* dac_cut(strategy, layer), cuts DAC elements out of annual averaged data (see above) and exports as new csv's given the strategy and layer
-smz_cut(special_management_zone, strategy, layer), cuts SMZ elements out of annual averaged data (see above) and exports as new csv's given the strategy and layer
-deltas(strategy, layer), calculates differences of annual average GW level relative to Baseline for each strategy
-*discontinued* dac_deltas(strategy, layer), calculates differences of GW level relative to Baseline for each strategy under DAC elements
-smz_deltas(special_management_zone, strategy, layer), calculates differences of annaul average GW level relative to Baseline for each strategy given SMZ type
-distribution(strategy, layer), calculate timeseries of min/max/stdv/med/mean on all annual average basin-wide elements
-distribution_deltas(strategy, layer), calculate timeseries of min/max/stdv/med/mean on all annual average deltas for basin-wide elements
-smz_distribution(special_management_zone, strategy, layer), calculate timeseries of min/max/stdv/med/mean on all annual average SMZ elements
-
-
-
-initial_analysis.py: make plots/tables of basin-wide time evolution of GW levels
-compare_layers(strategy), plot each layer type for given strategy, ANNUAL AVERAGE
-compare_strategies(layer), plot each strategy for given layer type, ANNUAL AVERAGE
-del_compare_strategies(Layer), plot deltas of each strategy compared to baseline, ANNUAL AVERAGE
-basin_boxplot(strategy, layer), create boxplots (distribution of all elements) from the last 10 years of simulation (annual average)
-basin_boxplot_del(strategy, layer), create boxplots (distribution of all elements) from the last 10 years of simulation (annual average of GW relative to Baseline)
-
+process_csv.py: *RUN FIRST TO GET NECESSARY FILES* Seperates layer type from data, calculates annual averages, cuts out special management zones
+calculates deltas (Groundwater level relative to baseline scenario), and creates tables of descriptive statistics. Exports csv's
+initial_analysis.py: make plots comparings strategies and boxplots of BASIN-WIDE time evolution of GW levels for deltas and non-deltas
 SMZ_plot.py : object-oreinted approach for plots comparing strategies and boxplots for both deltas and non-deltas
 
 GWL_Econ.py: estimate timeseries of pumping costs under SR1/SR2/SR3. Use current hydrograph, ignoring climate change predictions
-* Use pumping power equation: specific weight * flow rate * hydraulic head / pump efficiency
-* Assume 13.59 cents/kWh: https://findenergy.com/providers/merced-irrigation-district/
-* Assume 80% pump efficiency
-* Distance to water data (hydraulic head) given by DWR
-* Calculate cost to pump at 1 m3/s for 1 hour
+- Use pumping power equation: specific weight * flow rate * hydraulic head / pump efficiency
+- Assume 13.59 cents/kWh: https://findenergy.com/providers/merced-irrigation-district/
+- Assume 80% pump efficiency
+- Distance to water data (hydraulic head) given by DWR
+- Calculate cost to pump at 1 m3/s for 1 hour
 pumping_cost(subregion, Q=1, nu=0.8), export and plot timeseires of pumping cost (savings relative to Baseline) given subregion
 
 * archived * DACs.py: compare Flood-MAR strategies under DAC's
-dac_compare_strategies(layer), plot each strategy for given layer (under DAC's), ANNUAL AVERAGE
-dac_del_compare_strategies(layer), plot each strategy for given layer (under DAC's) relative to Baseline strategy, ANNUAL AVERAGE
-dac_boxplot(strategy, layer), create boxplots (distribution of DAC elements) from the last 10 years of simulation (annual average)
-dac_boxplot_del(strategy, layer), create boxplots (distribution of DAC elements) from the last 10 years of simulation (annual average of GW relative to Baseline)
-
 * archived * subsidence.py: compare Flood-MAR strategies under subsidence zones
-sub_compare_strategies(layer), plot each strategy for given layer (under subsidence zones), ANNUAL AVERAGE
-sub_del_compare_strategies(layer), plot each strategy for given layer (under subsidence zones) relative to Baseline strategy, ANNUAL AVERAGE
-sub_boxplot(strategy, layer), create boxplots (distribution of SUB elements) from the last 10 years of simulation (annual average)
-sub_boxplot_del(strategy, layer), create boxplots (distribution of SUB elements) from the last 10 years of simulation (annual average of GW relative to Baseline)
-
-
 * archived * GWDs.py: compare Flood-MAR strategies under GWD zones
-gwd_compare_strategies(layer), plot each strategy for given layer (under GWD zones), ANNUAL AVERAGE
-gwd_del_compare_strategies(layer), plot each strategy for given layer (under GWD zones) relative to Baseline strategy, ANNUAL AVERAGE
-gwd_boxplot(strategy, layer), create boxplots (distribution of GWD elements) from the last 10 years of simulation (annual average)
-gwd_boxplot_del(strategy, layer), create boxplots (distribution of GWD elements) from the last 10 years of simulation (annual average of GW relative to Baseline)
-
 
 
 
@@ -77,6 +43,7 @@ DEFINITION OF TERMS/FILENAMING CONVENTION:
 "SR1" / "SR2" / "SR3" - subregions delineated by DWR to compare pumping costs
 "flow rate" / "Q" - pump flow rate
 "pump efficiency" / "nu" - pump efficiency
+
 
 PROJECT FOLDER CONTENTS:
 Data/ - given groundwater level data from DWR
